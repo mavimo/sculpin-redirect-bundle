@@ -49,15 +49,16 @@ class RedirectGenerator implements GeneratorInterface
             // Clone current search with new sourceId.
             $generatedSource = $source->duplicate($redirect);
 
-            // Get destination path.
-            $source_path = $generatedSource->data()->get('permalink');
+            // Set destination is original source.
+            $generatedSource->data()->set('destination', $source);
 
             // Overwrite permalink.
             $generatedSource->data()->set('permalink', $redirect);
 
-            // Set destination in generated source.
-            $generatedSource->data()->set('destination', $source_path);
+            // Add redirect.
+            $generatedSource->data()->set('layout', 'redirect');
 
+            // Add generated source.
             $sources[] = $generatedSource;
         }
         return $sources;
