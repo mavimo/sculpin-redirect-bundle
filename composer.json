@@ -1,0 +1,22 @@
+{
+    "name": "mavimo/sculpin-redirect-bundle",
+    "description": "Sculpin Redirect Bundle",
+    "homepage": "https://sculpin.io",
+    "keywords": ["redirect", "blogging", "blog", "static", "site"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marco Vito Moscaritolo",
+            "email": "marco@mavimo.org",
+            "homepage": "http://www.mavimo.org"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "autoload": {
+        "psr-0": { "Mavimo\\Sculpin\\Bundle\\RedirectBundle": "" }
+    },
+    "target-dir": "Mavimo/Sculpin/Bundle/RedirectBundle",
+    "minimum-stability": "beta"
+}
