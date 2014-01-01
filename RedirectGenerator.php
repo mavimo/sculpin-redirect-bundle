@@ -34,7 +34,7 @@ class RedirectGenerator implements GeneratorInterface
      *
      * @param DataProviderManager $dataProviderManager Data Provider Manager
      */
-    public function __construct(DataProviderManager $dataProviderManager, $maxPerPage)
+    public function __construct(DataProviderManager $dataProviderManager)
     {
         $this->dataProviderManager = $dataProviderManager;
     }
