@@ -45,21 +45,21 @@ class RedirectGenerator implements GeneratorInterface
     public function generate(SourceInterface $source)
     {
         $sources = array();
-        foreach ($source->data->get('redirect') as $key => $redirect) {
+        foreach ($source->data()->get('redirect') as $key => $redirect) {
             // Clone current search with new sourceId.
             $generatedSource = $source->duplicate($redirect);
 
             // Get destination path.
-            $source = $generatedSource->data()->get('pernalink');
+            $source_path = $generatedSource->data()->get('permalink');
 
             // Overwrite permalink.
             $generatedSource->data()->set('permalink', $redirect);
 
             // Set destination in generated source.
-            $generatedSource->data()->set('destination', $source);
+            $generatedSource->data()->set('destination', $source_path);
 
-            $source[] = $generatedSource;
+            $sources[] = $generatedSource;
         }
-        return $source;
+        return $sources;
     }
 }
