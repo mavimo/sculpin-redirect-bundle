@@ -35,7 +35,6 @@ class SculpinKernel extends \Sculpin\Bundle\SculpinBundle\HttpKernel\AbstractKer
 In content that you import you can setup redirect items using:
 
 ```
-generator: redirect
 redirect:
     - alias-path.html
     - old-path.html

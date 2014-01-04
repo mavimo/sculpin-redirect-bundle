@@ -9,8 +9,7 @@
 
     <services>
         <service id="sculpin_redirect.generator" class="%sculpin_redirect.generator.class%">
-            <argument type="service" id="sculpin.data_provider_manager" />
-            <tag name="sculpin.generator" alias="redirect" />
+            <tag name="kernel.event_subscriber" />
         </service>
     </services>
 

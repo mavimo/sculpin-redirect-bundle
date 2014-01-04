@@ -11,56 +11,63 @@
 
 namespace Mavimo\Sculpin\Bundle\RedirectBundle;
 
-use Sculpin\Core\DataProvider\DataProviderManager;
-use Sculpin\Core\Generator\GeneratorInterface;
+use Sculpin\Core\Sculpin;
+use Sculpin\Core\Event\SourceSetEvent;
 use Sculpin\Core\Source\SourceInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Redirect Generator.
  *
  * @author Marco Vito Moscaritolo <marco@mavimo.org>
+ * @author Beau Simensen <beau@dflydev.com>
  */
-class RedirectGenerator implements GeneratorInterface
+class RedirectGenerator implements EventSubscriberInterface
 {
-    /**
-     * Data Provider Manager
-     *
-     * @var DataProviderManager
-     */
-    protected $dataProviderManager;
-
-    /**
-     * Constructor
-     *
-     * @param DataProviderManager $dataProviderManager Data Provider Manager
-     */
-    public function __construct(DataProviderManager $dataProviderManager)
-    {
-        $this->dataProviderManager = $dataProviderManager;
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function generate(SourceInterface $source)
+    public static function getSubscribedEvents()
     {
-        $sources = array();
-        foreach ($source->data()->get('redirect') as $key => $redirect) {
-            // Clone current search with new sourceId.
-            $generatedSource = $source->duplicate($redirect);
+        return array(
+            Sculpin::EVENT_BEFORE_RUN => 'beforeRun',
+        );
+    }
 
-            // Set destination is original source.
-            $generatedSource->data()->set('destination', $source);
+    public function beforeRun(SourceSetEvent $sourceSetEvent)
+    {
+        $sourceSet = $sourceSetEvent->sourceSet();
 
-            // Overwrite permalink.
-            $generatedSource->data()->set('permalink', $redirect);
+        foreach ($sourceSet->updatedSources() as $source) {
+            if ($source->isGenerated()) {
+                // Skip generated sources.
+                continue;
+            }
 
-            // Add redirect.
-            $generatedSource->data()->set('layout', 'redirect');
+            if (!$source->data()->get('redirect')) {
+                // Skip source that do not have redirect.
+                continue;
+            }
 
-            // Add generated source.
-            $sources[] = $generatedSource;
+            foreach ($source->data()->get('redirect') as $key => $redirect) {
+                // Clone current search with new sourceId.
+                $generatedSource = $source->duplicate($source->sourceId() . ':' . $redirect);
+
+                // Set destination is original source.
+                $generatedSource->data()->set('destination', $source);
+
+                // Overwrite permalink.
+                $generatedSource->data()->set('permalink', $redirect);
+
+                // Add redirect.
+                $generatedSource->data()->set('layout', 'redirect');
+
+                // Make sure Sculpin knows this source is generated.
+                $generatedSource->setIsGenerated();
+
+                // Add the generated source to the source set.
+                $sourceSet->mergeSource($generatedSource);
+            }
         }
-        return $sources;
     }
 }
