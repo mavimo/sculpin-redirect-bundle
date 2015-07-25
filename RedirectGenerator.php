@@ -44,7 +44,7 @@ class RedirectGenerator implements EventSubscriberInterface
                 continue;
             }
 
-            if (!$source->data()->get('redirect')) {
+            if (!$source->data()->get('redirect') && !$source->data()->get('full_redirect')) {
                 // Skip source that do not have redirect.
                 continue;
             }
@@ -67,6 +67,26 @@ class RedirectGenerator implements EventSubscriberInterface
 
                 // Add the generated source to the source set.
                 $sourceSet->mergeSource($generatedSource);
+            }
+
+            if ($source->data()->get('full_redirect')) {
+                $fullRedirect = $source->data()->get('full_redirect');
+
+                if (array_key_exists('origin', $fullRedirect) && array_key_exists('destination', $fullRedirect)) {
+                    $origin = $fullRedirect['origin'];
+                    $destination = $fullRedirect['destination'];
+
+                    // Set redirect destination.
+                    $source->data()->set('destination', $destination);
+
+                    // Overwrite permalink.
+                    $source->data()->set('permalink', $origin);
+
+                    // Add redirect.
+                    $source->data()->set('layout', 'redirect');
+
+                    $sourceSet->mergeSource($source);
+                }
             }
         }
     }
