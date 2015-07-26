@@ -45,13 +45,29 @@ Then create a ```redirect.html``` file in your theme with the following content:
 ```html
 <!DOCTYPE html>
 {% spaceless %}
+{% set destination = page.destination.url|default(page.destination) %}
 <html>
-  <head>
+<head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta http-equiv="refresh" content="0;url={{ page.destination.url }}" />
-  </head>
+    <meta http-equiv="refresh" content="0;url={{ destination }}" />
+</head>
+<body>
+<p>Redirecting to <a href="{{ destination }}">{{ destination }}</a>...
+</p>
+</body>
 </html>
 {% endspaceless %}
 ```
 
-Now if a user visit the a ```alias-path.html```will be redirect on original page.
+In the above example, both /alias-path.html and /old-path.html will point to the slug of the file you are editing
+
+If you would like to redirect to an offsite url, say /feed to feedburner, use this configuration. Content on this source will be ignored
+
+```
+---
+full_redirect:
+    origin: feed
+    destination: "http://feeds.feedburner.com/timbroder"
+---
+```
+

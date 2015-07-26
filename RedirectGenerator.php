@@ -44,29 +44,51 @@ class RedirectGenerator implements EventSubscriberInterface
                 continue;
             }
 
-            if (!$source->data()->get('redirect')) {
+            if (!$source->data()->get('redirect') && !$source->data()->get('full_redirect')) {
                 // Skip source that do not have redirect.
                 continue;
             }
 
-            foreach ($source->data()->get('redirect') as $key => $redirect) {
-                // Clone current search with new sourceId.
-                $generatedSource = $source->duplicate($source->sourceId() . ':' . $redirect);
+            if ($source->data()->get('redirect')) {
+                foreach ($source->data()->get('redirect') as $key => $redirect) {
+                    // Clone current search with new sourceId.
+                    $generatedSource = $source->duplicate($source->sourceId() . ':' . $redirect);
 
-                // Set destination is original source.
-                $generatedSource->data()->set('destination', $source);
+                    // Set destination is original source.
+                    $generatedSource->data()->set('destination', $source);
 
-                // Overwrite permalink.
-                $generatedSource->data()->set('permalink', $redirect);
+                    // Overwrite permalink.
+                    $generatedSource->data()->set('permalink', $redirect);
 
-                // Add redirect.
-                $generatedSource->data()->set('layout', 'redirect');
+                    // Add redirect.
+                    $generatedSource->data()->set('layout', 'redirect');
 
-                // Make sure Sculpin knows this source is generated.
-                $generatedSource->setIsGenerated();
+                    // Make sure Sculpin knows this source is generated.
+                    $generatedSource->setIsGenerated();
 
-                // Add the generated source to the source set.
-                $sourceSet->mergeSource($generatedSource);
+                    // Add the generated source to the source set.
+                    $sourceSet->mergeSource($generatedSource);
+                }
+            }
+
+            if ($source->data()->get('full_redirect')) {
+                $fullRedirect = $source->data()->get('full_redirect');
+
+                if (array_key_exists('origin', $fullRedirect) && array_key_exists('destination', $fullRedirect)) {
+                    $origin = $fullRedirect['origin'];
+                    $destination = $fullRedirect['destination'];
+
+                    // Set redirect destination.
+                    $source->data()->set('destination', $destination);
+
+                    // Overwrite permalink.
+                    $source->data()->set('permalink', $origin);
+
+                    // Add redirect.
+                    $source->data()->set('layout', 'redirect');
+
+                    $sourceSet->mergeSource($source);
+                }
             }
         }
     }
