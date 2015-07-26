@@ -49,24 +49,26 @@ class RedirectGenerator implements EventSubscriberInterface
                 continue;
             }
 
-            foreach ($source->data()->get('redirect') as $key => $redirect) {
-                // Clone current search with new sourceId.
-                $generatedSource = $source->duplicate($source->sourceId() . ':' . $redirect);
+            if ($source->data()->get('redirect')) {
+                foreach ($source->data()->get('redirect') as $key => $redirect) {
+                    // Clone current search with new sourceId.
+                    $generatedSource = $source->duplicate($source->sourceId() . ':' . $redirect);
 
-                // Set destination is original source.
-                $generatedSource->data()->set('destination', $source);
+                    // Set destination is original source.
+                    $generatedSource->data()->set('destination', $source);
 
-                // Overwrite permalink.
-                $generatedSource->data()->set('permalink', $redirect);
+                    // Overwrite permalink.
+                    $generatedSource->data()->set('permalink', $redirect);
 
-                // Add redirect.
-                $generatedSource->data()->set('layout', 'redirect');
+                    // Add redirect.
+                    $generatedSource->data()->set('layout', 'redirect');
 
-                // Make sure Sculpin knows this source is generated.
-                $generatedSource->setIsGenerated();
+                    // Make sure Sculpin knows this source is generated.
+                    $generatedSource->setIsGenerated();
 
-                // Add the generated source to the source set.
-                $sourceSet->mergeSource($generatedSource);
+                    // Add the generated source to the source set.
+                    $sourceSet->mergeSource($generatedSource);
+                }
             }
 
             if ($source->data()->get('full_redirect')) {
